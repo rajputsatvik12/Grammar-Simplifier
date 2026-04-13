@@ -1,0 +1,358 @@
+/*
+ * grammar.css
+ * ─────────────────────────────────────────────────────────────────
+ * All grammar-specific visual components:
+ *   • Production rule lines (LHS → RHS)
+ *   • Token colouring (non-terminals, terminals, epsilon)
+ *   • Step accordion blocks (expand/collapse)
+ *   • Symbol-set pill rows
+ *   • Info/detail boxes inside steps
+ *   • Scrollable production box
+ *   • Before/After diff grid
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   PRODUCTION BOX
+   A scrollable, inset-background container holding a rule list.
+═══════════════════════════════════════════════════════════════ */
+.prod-box {
+  background: var(--clr-bg-inset);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRODUCTION LIST  &  INDIVIDUAL RULE LINE
+═══════════════════════════════════════════════════════════════ */
+.production-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.production-item {
+  display: grid;
+  grid-template-columns: 28px 16px 1fr;  /* LHS | arrow | RHS */
+  align-items: baseline;
+  column-gap: var(--sp-2);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--clr-border);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+}
+
+.production-item:last-child {
+  border-bottom: none;
+}
+
+/* Left-hand side symbol */
+.prod-lhs {
+  color: var(--clr-accent);
+  font-weight: 700;
+  text-align: right;
+}
+
+/* → arrow */
+.prod-arrow {
+  color: var(--clr-text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Right-hand side — contains inline token spans */
+.prod-rhs {
+  color: var(--clr-text-primary);
+  word-break: break-all;
+  line-height: 1.8;
+}
+
+/* Alternation separator */
+.prod-pipe {
+  color: var(--clr-text-muted);
+  margin: 0 6px;
+  font-size: 11px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOKEN COLOURS  (individual symbols inside RHS spans)
+═══════════════════════════════════════════════════════════════ */
+
+/* Non-terminal: blue and bold */
+.tok-nt {
+  color: var(--clr-accent);
+  font-weight: 600;
+}
+
+/* Terminal: emerald-green */
+.tok-t {
+  color: var(--clr-green);
+}
+
+/* Epsilon: violet italic */
+.tok-eps {
+  color: var(--clr-violet);
+  font-style: italic;
+}
+
+/* Newly added token (after expansion) */
+.tok-new {
+  color: var(--clr-amber);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STEP ACCORDION BLOCK
+   Each minimization step is one of these.
+═══════════════════════════════════════════════════════════════ */
+.step-block {
+  background: var(--clr-bg-inset);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-3);
+  overflow: hidden;
+}
+
+/* Clickable header row */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 12px var(--sp-4);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--t-base);
+}
+
+.step-header:hover {
+  background: var(--clr-bg-hover);
+}
+
+/* Numbered circle */
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--clr-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Step title text */
+.step-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clr-text-primary);
+  flex: 1;
+}
+
+/* Small outcome badge (e.g. "−3 items", "no changes") */
+.step-outcome {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--clr-border-mid);
+  color: var(--clr-text-secondary);
+  background: var(--clr-bg-card);
+  flex-shrink: 0;
+}
+
+.step-outcome.changed {
+  border-color: rgba(240,106,106,.35);
+  color: var(--clr-red);
+  background: var(--clr-red-dim);
+}
+
+.step-outcome.unchanged {
+  border-color: rgba(62,207,142,.30);
+  color: var(--clr-green);
+  background: var(--clr-green-dim);
+}
+
+/* Expand/collapse caret */
+.step-caret {
+  color: var(--clr-text-muted);
+  font-size: 11px;
+  transition: transform var(--t-base);
+  flex-shrink: 0;
+}
+
+/* When open: rotate caret 90° */
+.step-block.open .step-caret {
+  transform: rotate(90deg);
+}
+
+/* Collapsible body — animated via max-height trick */
+.step-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--t-slow);
+}
+
+.step-block.open .step-body {
+  max-height: 900px;  /* large enough for any content */
+}
+
+/* Body inner padding (separated from overflow:hidden container) */
+.step-body-inner {
+  padding: 0 var(--sp-4) var(--sp-4);
+  border-top: 1px solid var(--clr-border);
+}
+
+/* Prose explanation inside the step */
+.step-desc {
+  font-size: 13px;
+  color: var(--clr-text-secondary);
+  line-height: 1.8;
+  margin: var(--sp-3) 0 var(--sp-3);
+}
+
+.step-desc code {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border-mid);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--clr-violet);
+}
+
+.step-desc em { color: var(--clr-accent); font-style: italic; }
+
+/* Subheading inside step body */
+.step-section-label {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--clr-text-muted);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INFO BOX  (algorithmic details inside step body)
+═══════════════════════════════════════════════════════════════ */
+.info-box {
+  background: rgba(108,143,255,.06);
+  border: 1px solid rgba(108,143,255,.18);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: 12.5px;
+  color: var(--clr-text-secondary);
+  line-height: 1.8;
+  margin-top: var(--sp-3);
+}
+
+.info-box strong { color: var(--clr-text-primary); font-weight: 600; }
+.info-box code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--clr-violet);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SYMBOL PILLS  (sets of non-terminals / terminals / eliminated)
+═══════════════════════════════════════════════════════════════ */
+.symbol-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+/* Base pill */
+.sym-pill {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--clr-border-mid);
+  color: var(--clr-text-secondary);
+  white-space: nowrap;
+}
+
+/* Non-terminal pill: blue */
+.sym-pill.nt {
+  border-color: rgba(108,143,255,.35);
+  color: var(--clr-accent);
+  background: var(--clr-accent-dim);
+}
+
+/* Terminal pill: green */
+.sym-pill.t {
+  border-color: rgba(62,207,142,.32);
+  color: var(--clr-green);
+  background: var(--clr-green-dim);
+}
+
+/* Eliminated / removed pill: red strikethrough */
+.sym-pill.gone {
+  border-color: rgba(240,106,106,.30);
+  color: var(--clr-red);
+  background: var(--clr-red-dim);
+  text-decoration: line-through;
+  opacity: .8;
+}
+
+/* Nullable pill: violet */
+.sym-pill.nullable {
+  border-color: rgba(180,142,255,.32);
+  color: var(--clr-violet);
+  background: var(--clr-violet-dim);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BEFORE / AFTER DIFF GRID
+═══════════════════════════════════════════════════════════════ */
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+.diff-col-header {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: var(--sp-2);
+}
+
+.diff-col-header.before { color: var(--clr-red); }
+.diff-col-header.after  { color: var(--clr-green); }
+
+/* Striped rows for diff readability */
+.diff-col .production-item:nth-child(even) {
+  background: rgba(255,255,255,.015);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EMPTY GRAMMAR PLACEHOLDER
+   Shown inside .prod-box when nothing to display.
+═══════════════════════════════════════════════════════════════ */
+.empty-grammar {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--clr-text-muted);
+  font-style: italic;
+  padding: var(--sp-3) 0;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .diff-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,209 @@
+/*
+ * layout.css
+ * ─────────────────────────────────────────────────────────────────
+ * Macro-level layout: header, hero section, main two-panel
+ * workspace, and responsive breakpoints.
+ *
+ * Rule: nothing visual (colours beyond tokens, shadows, borders on
+ * components) lives here — only structural positioning rules.
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   SITE HEADER
+   Sticky navigation bar spanning the full viewport width.
+═══════════════════════════════════════════════════════════════ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-10);
+  background: rgba(8,11,20,.85);           /* frosted glass effect */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+/* Logo cluster: icon + wordmark */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  text-decoration: none;
+}
+
+.header-logo-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--r-sm);
+  background: var(--clr-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: -1.5px;
+  user-select: none;
+}
+
+.header-logo-wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--clr-text-primary);
+  letter-spacing: -.03em;
+}
+
+.header-logo-wordmark em {
+  font-style: normal;
+  color: var(--clr-accent);
+}
+
+.header-course-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--clr-text-muted);
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION
+   Full-width banner above the workspace.
+═══════════════════════════════════════════════════════════════ */
+.hero {
+  text-align: center;
+  padding: var(--sp-12) var(--sp-10) var(--sp-8);
+  border-bottom: 1px solid var(--clr-border);
+  /* Radial highlight from top-centre */
+  background:
+    radial-gradient(ellipse 75% 60% at 50% -10%,
+      rgba(108,143,255,.09) 0%, transparent 70%),
+    var(--clr-bg-page);
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--clr-accent);
+  background: var(--clr-accent-dim);
+  border: 1px solid rgba(108,143,255,.25);
+  border-radius: var(--r-pill);
+  padding: 4px 14px;
+  margin-bottom: var(--sp-5);
+}
+
+.hero h1 {
+  /* Gradient text */
+  background: linear-gradient(135deg, var(--clr-text-primary) 45%, var(--clr-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sp-4);
+}
+
+.hero-subtitle {
+  color: var(--clr-text-secondary);
+  font-size: .95rem;
+  max-width: 580px;
+  margin: 0 auto var(--sp-6);
+  line-height: 1.75;
+}
+
+/* Step chips row */
+.hero-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN WORKSPACE
+   Two equal columns: left = input, right = output.
+═══════════════════════════════════════════════════════════════ */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: calc(100vh - 72px - 210px);  /* below header + hero */
+  align-items: start;
+}
+
+/* Each panel */
+.panel {
+  padding: var(--sp-8) var(--sp-10);
+  border-right: 1px solid var(--clr-border);
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+/* Panel section label ("01 · Grammar Input") */
+.panel-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--clr-text-muted);
+  margin-bottom: var(--sp-6);
+}
+
+.panel-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--clr-border);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    border-right: none;
+    border-bottom: 1px solid var(--clr-border);
+    padding: var(--sp-6) var(--sp-5);
+  }
+
+  .panel:last-child {
+    border-bottom: none;
+  }
+
+  .site-header {
+    padding: var(--sp-3) var(--sp-5);
+  }
+
+  .header-course-tag { display: none; }
+
+  .hero {
+    padding: var(--sp-8) var(--sp-5) var(--sp-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.9rem; }
+  .hero-steps { gap: 6px; }
+}

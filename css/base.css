@@ -1,0 +1,170 @@
+/*
+ * base.css
+ * ─────────────────────────────────────────────────────────────────
+ * Design tokens (CSS custom properties), global reset, and
+ * typographic base styles.
+ *
+ * Nothing layout-specific lives here — only the foundational
+ * building blocks that every other CSS file imports from.
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   All colours, spacing, radii and font stacks are defined once
+   here and referenced everywhere else via var(--token-name).
+   Changing a token here propagates across the whole UI.
+═══════════════════════════════════════════════════════════════ */
+:root {
+  /* — Colour palette — */
+  --clr-bg-page:       #080b14;   /* deepest background             */
+  --clr-bg-panel:      #0e1120;   /* header / sidebar surfaces      */
+  --clr-bg-card:       #141829;   /* elevated card surfaces         */
+  --clr-bg-inset:      #0b0e1a;   /* recessed / textarea background */
+  --clr-bg-hover:      #1c2135;   /* hover state surface            */
+
+  --clr-border:        #1e2540;   /* default border                 */
+  --clr-border-mid:    #252d4a;   /* slightly brighter border       */
+  --clr-border-accent: #2e3a60;   /* accent border (focused states) */
+
+  --clr-text-primary:  #dde4f5;   /* main readable text             */
+  --clr-text-secondary:#8490b8;   /* muted secondary text           */
+  --clr-text-muted:    #404d72;   /* placeholder / hint text        */
+
+  /* — Accent palette — */
+  --clr-accent:        #6c8fff;   /* electric-indigo — primary CTA  */
+  --clr-accent-dim:    rgba(108,143,255,.12);
+  --clr-accent-glow:   rgba(108,143,255,.20);
+  --clr-green:         #3ecf8e;   /* kept / success                 */
+  --clr-green-dim:     rgba(62,207,142,.10);
+  --clr-violet:        #b48eff;   /* nullable / epsilon             */
+  --clr-violet-dim:    rgba(180,142,255,.10);
+  --clr-amber:         #f9bc4a;   /* warning                        */
+  --clr-amber-dim:     rgba(249,188,74,.10);
+  --clr-red:           #f06a6a;   /* error / eliminated             */
+  --clr-red-dim:       rgba(240,106,106,.10);
+
+  /* — Typography — */
+  --font-ui:      'Syne', 'Trebuchet MS', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Consolas', monospace;
+  --font-display: 'Syne', serif;
+
+  /* — Spacing scale (4-pt grid) — */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* — Border radii — */
+  --r-sm:  5px;
+  --r-md:  9px;
+  --r-lg:  14px;
+  --r-xl:  20px;
+  --r-pill: 999px;
+
+  /* — Shadows — */
+  --shadow-card:  0 4px 24px rgba(0,0,0,.45);
+  --shadow-focus: 0 0 0 3px var(--clr-accent-glow);
+
+  /* — Transitions — */
+  --ease: cubic-bezier(.4,0,.2,1);
+  --t-fast:   .12s var(--ease);
+  --t-base:   .20s var(--ease);
+  --t-slow:   .35s var(--ease);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET
+   Minimal opinionated reset — preserve useful browser defaults,
+   only strip the ones that cause cross-browser inconsistency.
+═══════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--clr-text-primary);
+  background: var(--clr-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Remove list styling when a list bears a role */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Make images easier to work with */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Inherit fonts for form elements */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY SCALE
+═══════════════════════════════════════════════════════════════ */
+h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; font-weight: 800; letter-spacing: -.03em; }
+h2 { font-size: 1.5rem;  line-height: 1.25; font-weight: 700; letter-spacing: -.02em; }
+h3 { font-size: 1.1rem;  line-height: 1.35; font-weight: 600; }
+h4 { font-size: .9rem;   line-height: 1.5;  font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+
+p  { max-width: 68ch; }
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: .875em;
+}
+
+a {
+  color: var(--clr-accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--clr-border);
+}
+
+/* Scrollbar styling (webkit) */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--clr-border-mid); border-radius: var(--r-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-border-accent); }
+
+/* Selection colour */
+::selection {
+  background: var(--clr-accent-dim);
+  color: var(--clr-text-primary);
+}

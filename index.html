@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!--
+  index.html  —  CFG Simplifier Entry Point
+  ──────────────────────────────────────────────────────────────────
+  This file contains ONLY semantic markup.
+  • All visual rules   → css/
+  • All behaviour      → js/
+  • All grammar logic  → js/engine/
+
+  CS 4820 · Theory of Computation · Class of 2028
+  Sample Project — Context-Free Grammar Minimization Tool
+  ──────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive tool for step-by-step context-free grammar simplification — CS 4820 sample project." />
+
+  <title>CFG Simplifier — Theory of Computation</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Google Fonts — loaded before CSS to avoid FOUT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!--
+    CSS load order matters:
+      1. base.css       — design tokens, reset (everything else depends on these)
+      2. layout.css     — structural positioning
+      3. components.css — reusable UI widgets
+      4. grammar.css    — grammar-specific display
+      5. animations.css — keyframes (loaded last so they can reference classes)
+  -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/grammar.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SITE HEADER
+  ═══════════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <a class="header-logo" href="#" aria-label="CFG Simplifier home">
+      <div class="header-logo-icon" aria-hidden="true">G</div>
+      <span class="header-logo-wordmark">CFG <em>Simplifier</em></span>
+    </a>
+    <span class="header-course-tag" aria-label="Course identifier">
+      CS 4820 · Theory of Computation · 2028
+    </span>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO SECTION
+  ═══════════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <p class="hero-eyebrow" aria-hidden="true">
+      <span>◈</span> Grammar Simplification
+    </p>
+    <h1 id="hero-title">Context-Free Grammar Minimizer</h1>
+    <p class="hero-subtitle">
+      Input any CFG and watch it simplified step-by-step.
+      Each transformation is explained in plain language so you
+      understand <em>why</em> the grammar changes, not just that it does.
+    </p>
+
+    <!-- Visual step labels -->
+    <div class="hero-steps" role="list" aria-label="Simplification steps performed">
+      <span class="step-chip active" role="listitem">Step 1 · Remove Useless Symbols</span>
+      <span class="step-chip active" role="listitem">Step 2 · Eliminate ε-Productions</span>
+      <span class="step-chip active" role="listitem">Step 3 · Eliminate Unit Productions</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN WORKSPACE  (two equal panels)
+  ═══════════════════════════════════════════════════════════════ -->
+  <main class="workspace" role="main">
+
+    <!-- ─── LEFT PANEL: INPUT ─────────────────────────────────── -->
+    <section class="panel" aria-label="Grammar input">
+      <div class="panel-eyebrow" aria-hidden="true">01 · Grammar Input</div>
+
+      <!-- Example loader -->
+      <div class="card">
+        <div class="card-label">
+          <span aria-hidden="true">📂</span>
+          Load a sample grammar
+        </div>
+        <select
+          id="examples-select"
+          class="examples-select"
+          aria-label="Select an example grammar">
+        </select>
+        <!-- Options injected by controller.js -->
+      </div>
+
+      <!-- Grammar textarea -->
+      <div class="card">
+        <div class="card-label">
+          <span aria-hidden="true">✏️</span>
+          Production rules
+          <span style="margin-left:auto;font-size:11px;color:var(--clr-text-muted);">
+            Ctrl+Enter to run
+          </span>
+        </div>
+
+        <textarea
+          id="grammar-textarea"
+          class="grammar-textarea"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          aria-label="Enter grammar production rules"
+          aria-describedby="syntax-hint"
+          placeholder="S → A B | a
+A → a | ε
+B → b | C
+C → c d"></textarea>
+
+        <!-- Action buttons -->
+        <div class="btn-group">
+          <button
+            id="run-btn"
+            class="btn btn-primary"
+            type="button"
+            aria-label="Run minimization pipeline">
+            <span aria-hidden="true">⚙</span> Minimize Grammar
+          </button>
+          <button
+            id="clear-btn"
+            class="btn btn-danger"
+            type="button"
+            aria-label="Clear grammar input">
+            Clear
+          </button>
+        </div>
+
+        <!-- Status feedback banner -->
+        <div
+          id="status-banner"
+          class="status-banner"
+          role="status"
+          aria-live="polite">
+        </div>
+      </div>
+
+      <!-- Input syntax guide -->
+      <div class="card" id="syntax-hint">
+        <div class="card-label">
+          <span aria-hidden="true">ℹ</span> Input syntax guide
+        </div>
+        <div class="syntax-guide" aria-label="Grammar input syntax reference">
+          <div>
+            <span class="sg-lhs">S</span> → <span class="sg-lhs">A</span> <span class="sg-term">b</span> | <span class="sg-term">c</span>
+          </div>
+          <div>
+            <span class="sg-lhs">A</span> → <span class="sg-term">a</span> | <span class="sg-eps">ε</span>
+          </div>
+          <div>
+            <span class="sg-lhs">B</span> → <span class="sg-lhs">B</span> <span class="sg-term">b</span> | <span class="sg-term">b</span>
+          </div>
+          <span class="sg-hint">
+            • Upper-case = non-terminal · lower-case = terminal<br>
+            • First rule's LHS is the start symbol<br>
+            • Use → or -> or : for the arrow<br>
+            • Epsilon: ε, eps, epsilon, or λ<br>
+            • Alternatives separated by |  ·  Comments: // or #
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── RIGHT PANEL: OUTPUT ───────────────────────────────── -->
+    <section class="panel" aria-label="Minimization results">
+      <div class="panel-eyebrow" aria-hidden="true">02 · Minimization Output</div>
+
+      <!-- Idle placeholder (shown before first run) -->
+      <div id="idle-state" class="idle-state" role="status">
+        <div class="idle-icon" aria-hidden="true">∑</div>
+        <p>
+          Enter a grammar on the left and click
+          <strong>Minimize Grammar</strong> — or press
+          <kbd>Ctrl+Enter</kbd> — to see the step-by-step
+          simplification here.
+        </p>
+      </div>
+
+      <!-- Result area (hidden until first run, shown by controller.js) -->
+      <div id="result-area" style="display:none;" aria-live="polite">
+
+        <!-- Quick statistics row -->
+        <div id="stats-row" class="stats-row" aria-label="Summary statistics">
+          <!-- Filled by renderer.renderStatsRow() via controller -->
+        </div>
+
+        <!-- Output tab bar -->
+        <nav class="tab-bar" role="tablist" aria-label="Output views">
+          <button
+            class="tab-btn active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tab-steps"
+            data-tab="steps">
+            Step-by-Step
+          </button>
+          <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-final"
+            data-tab="final">
+            Final Grammar
+          </button>
+          <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-compare"
+            data-tab="compare">
+            Before / After
+          </button>
+        </nav>
+
+        <!-- Tab: Step-by-step accordion -->
+        <div
+          id="tab-steps"
+          class="tab-pane active"
+          role="tabpanel"
+          aria-labelledby="tab-btn-steps">
+          <div id="steps-container">
+            <!-- Filled by renderStepBlock() via controller -->
+          </div>
+        </div>
+
+        <!-- Tab: Final minimized grammar -->
+        <div
+          id="tab-final"
+          class="tab-pane"
+          role="tabpanel"
+          aria-labelledby="tab-btn-final">
+          <div class="card">
+            <div class="card-label">
+              <span aria-hidden="true">✅</span> Minimized grammar
+            </div>
+            <div id="final-grammar-box" class="prod-box">
+              <!-- Filled by renderGrammar() via controller -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Before / After comparison -->
+        <div
+          id="tab-compare"
+          class="tab-pane"
+          role="tabpanel"
+          aria-labelledby="tab-btn-compare">
+          <div id="compare-box">
+            <!-- Filled by renderDiffGrid() via controller -->
+          </div>
+        </div>
+
+      </div>
+      <!-- /#result-area -->
+
+    </section>
+    <!-- /.panel (right) -->
+
+  </main>
+
+  <!--
+    JavaScript — loaded as ES modules at the end of body.
+
+    Module dependency tree:
+      controller.js
+        ├── parser.js
+        ├── engine/index.js
+        │     ├── engine/useless.js  → parser.js
+        │     ├── engine/epsilon.js  → parser.js
+        │     └── engine/unit.js     → parser.js
+        └── renderer.js
+
+    type="module" gives us:
+      • ES6 import/export syntax
+      • Deferred execution (equivalent to defer)
+      • Strict mode by default
+      • Module-level scoping (no globals except what we explicitly expose)
+  -->
+  <script type="module" src="js/controller.js"></script>
+
+</body>
+</html>
