@@ -131,11 +131,4 @@ python3 -m http.server 8080
 
 ---
 
-## Academic Notes
 
-This project is intentionally written without frameworks or bundlers so that students can read, trace, and modify every line. The algorithms directly mirror the pseudocode in:
-
-- Sipser, M. — *Introduction to the Theory of Computation*, Ch. 2
-- Hopcroft, Motwani & Ullman — *Introduction to Automata Theory*, Ch. 7
-
-The step numbering and naming in the UI matches the standard textbook presentation.
